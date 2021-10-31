@@ -1,7 +1,32 @@
-"""
-test code: plot M-R
-"""
-
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import log10 as lg
+from numpy import pi as pi
+from scipy.interpolate import interp1d as sp_interp1d
+from scipy.integrate import odeint
+from scipy.integrate import ode
+import warnings
+import timeit
+import scipy.optimize as opt
+from matplotlib import cm
+plt.rcParams['xtick.labelsize'] = 25
+plt.rcParams['ytick.labelsize'] = 25
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
+plt.rcParams['xtick.major.size'] = 8
+plt.rcParams['ytick.major.size'] = 8
+plt.rcParams['xtick.minor.size'] = 4
+plt.rcParams['ytick.minor.size'] = 4
+plt.rcParams['xtick.top'] = True
+plt.rcParams['ytick.right'] = True
+plt.rcParams['axes.labelpad'] = 8.0
+plt.rcParams['figure.constrained_layout.h_pad'] = 0
+plt.rcParams['text.usetex'] = True
+plt.rc('text', usetex=True)
+plt.rcParams['font.sans-serif'] = ['Times New Roman']
+plt.tick_params(axis='both', which='minor', labelsize=18)
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+                               AutoMinorLocator)
 import sys
 import warnings
 import timeit
@@ -13,6 +38,7 @@ from matplotlib import cm
 from scipy.integrate import ode as sp_ode
 
 t0 = timeit.time.time()
+from shapely.geometry import LineString
 
 PI4 = 4.0 * pi
 ka = 8.0 * pi
@@ -36,7 +62,7 @@ def pdiml(p):
     """ dimensionless pressure """
     return G*p/c**4 * runit**2
 
-colorset=['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple']   
+colorset = ['black', 'lightcoral','yellowgreen'] 
 
 
 stdata1 = np.genfromtxt('stgb_linear_sol_data1.txt')
@@ -48,7 +74,7 @@ stdata6 = np.genfromtxt('stgb_linear_sol_data6.txt')
 
 stn1 = len(stdata1)
 #stn1, stn2, stn3, stn4, stn5 = len(strot1), len(strot2), len(strot3), len(strot4), len(strot5)
-ntrim = 700
+ntrim = 900
 
 # ec, interior ph_r/ph, exterior ph_r/ph
 d10, d11, d12 = stdata1[:, 0], stdata1[:, 1], stdata1[:, 2]
@@ -59,46 +85,120 @@ d50, d51, d52 = stdata5[:, 0], stdata5[:, 1], stdata5[:, 2]
 d60, d61, d62 = stdata6[:, 0], stdata6[:, 1], stdata6[:, 2]
 
 
-fig = plt.figure(figsize=(6,12))
-ax1 = fig.add_subplot(211)
-ax2 = fig.add_subplot(212)
+fig, (ax1,ax2) = plt.subplots(2, 1,figsize=(10,12),sharex=True)
+plt.subplots_adjust(hspace=0.0)
 
 
 
 
-ax1.set_xlabel(r'$\epsilon_0$', fontsize=20)
-ax1.set_ylabel(r'$\frac{\Phi^{\prime}}{\Phi}|_s$', fontsize=20)
-ax2.set_xlabel(r'$\epsilon_0$', fontsize=20)
-ax2.set_ylabel(r'$\frac{\Phi^{\prime}}{\Phi}|_s$', fontsize=20)
+
+
+# ax1.set_xlabel(r'$\epsilon_0$', fontsize=20)
+ax1.set_ylabel(r'$\left(\Phi^{\prime}/\Phi\right)|_{\rm s}\,[0.1\rm \,km^{-1}]$', fontsize=30)
+ax2.set_xlabel(r'$\epsilon_0\,[10^{15}\,\rm g\,\rm cm^{-3}]$', fontsize=30)
+ax2.set_ylabel(r'$\left(\Phi^{\prime}/\Phi\right)|_{\rm s}\,[0.1\rm \,km^{-1}]$', fontsize=30)
 
 
  
 # ph_r/ph
-ax1.set_ylim([-10, 10])
+ax1.set_ylim([-11, 11])
 #ax1.set_xlim([0, 10])
-ax1.plot( d40[0:ntrim], d41[0:ntrim] , '--', color = colorset[0])
-ax1.plot( d40[0:ntrim], d42[0:ntrim] , color = colorset[0])
-ax1.plot( d50[0:ntrim], d51[0:ntrim] , '--', color = colorset[1])
-ax1.plot( d50[0:ntrim], d52[0:ntrim] , color = colorset[1])
-ax1.plot( d60[0:ntrim], d61[0:ntrim] , '--', color = colorset[2])
-ax1.plot( d60[0:ntrim], d62[0:ntrim] , color = colorset[2])
+ax1.plot( d40[0:ntrim]/10**15, d41[0:ntrim] , '--', color = colorset[0],linewidth=2)
+ax1.plot( d40[0:ntrim]/10**15, d42[0:ntrim] , color = colorset[0],linewidth=2,label='$b=0.9$')
+ax1.plot( d50[0:ntrim]/10**15, d51[0:ntrim] , '--', color = colorset[1],linewidth=2)
+ax1.plot( d50[0:ntrim]/10**15, d52[0:ntrim] , color = colorset[1],linewidth=2,label='$b=3$')
+line1=LineString(np.column_stack((d50/10**15,d51)))
+line2=LineString(np.column_stack((d50/10**15,d52)))
+intersection=line1.intersection(line2)
+ax1.plot(*intersection.xy,color='brown',markersize=10,marker='o')
+ax1.plot( d60[0:ntrim]/10**15, d61[0:ntrim] , '--', color = colorset[2],linewidth=2)
+# a=np.zeros(900)
+# b=np.zeros(900)
 
 
+# find the jump location
+for i in range(1,ntrim):
+    if abs(d62[i]-d62[i-1])>10:
+        a=d60[i]
+        b=i
+
+ax1.plot(d60[0:b-1]/10**15, d62[0:b-1] , color = colorset[2],linewidth=2,label='$b=10$')
+ax1.plot(d60[b+1:ntrim]/10**15, d62[b+1:ntrim] , color = colorset[2],linewidth=2)
+line1=LineString(np.column_stack((d60[b+1:ntrim]/10**15,d61[b+1:ntrim])))
+line2=LineString(np.column_stack((d60[b+1:ntrim]/10**15,d62[b+1:ntrim])))
+intersection=line1.intersection(line2)
+ax1.plot(*intersection.xy,'olive',markersize=10,marker='o')
+# line1=LineString(np.column_stack((d60/10**15,d61)))
+# line2=LineString(np.column_stack((d60/10**15,d62)))
+# intersection=line1.intersection(line2)
+# if intersection.geom_type == 'MultiPoint':
+#     ax1.plot(*LineString(intersection).xy, 'o')
+# elif intersection.geom_type == 'Point':
+#     plt.plot(*intersection.xy, 'o')
+
+line1=LineString(np.column_stack((d60[0:b-1]/10**15,d61[0:b-1])))
+line2=LineString(np.column_stack((d60[0:b-1]/10**15,d62[0:b-1])))
+intersection=line1.intersection(line2)
+ax1.plot(*intersection.xy,'olive',markersize=10,marker='o')
 
 
-ax2.set_ylim([-10, 10])
+ax2.set_ylim([-11, 11])
 #ax1.set_xlim([0, 10])
-ax2.plot( d10[0:ntrim], d11[0:ntrim] , '--', color = colorset[0])
-ax2.plot( d10[0:ntrim], d12[0:ntrim] , color = colorset[0])
-ax2.plot( d20[0:ntrim], d21[0:ntrim] , '--', color = colorset[1])
-ax2.plot( d20[0:ntrim], d22[0:ntrim] , color = colorset[1])
-ax2.plot( d30[0:ntrim], d31[0:ntrim] , '--', color = colorset[2])
-ax2.plot( d30[0:ntrim], d32[0:ntrim] , color = colorset[2])
+ax2.plot( d10[0:ntrim]/10**15, d11[0:ntrim] , '--', color = colorset[0],linewidth=2)
+ax2.plot( d10[0:ntrim]/10**15, d12[0:ntrim] , color = colorset[0],linewidth=2,label='$b=-0.04$')
+
+for k in range(1,ntrim):
+    if abs(d21[k]-d21[k-1])>100:
+        e=d20[k]
+        f=k
+ax2.plot( d20[0:f-1]/10**15, d21[0:f-1] , '--', color = colorset[1],linewidth=2)
+ax2.plot( d20[f+1:ntrim]/10**15, d21[f+1:ntrim] , '--', color = colorset[1],linewidth=2)
+ax2.plot( d20[0:ntrim]/10**15, d22[0:ntrim] , color = colorset[1],linewidth=2,label='$b=-0.2$')
+
+line1=LineString(np.column_stack((d20[0:f-1]/10**15, d21[0:f-1])))
+line2=LineString(np.column_stack((d20[0:f-1]/10**15, d22[0:f-1])))
+intersection=line1.intersection(line2)
+ax2.plot(*intersection.xy,color='brown',markersize=10,marker='o')
+
+
+# find the jump location
+c=[]
+d=[]
+for i in range(1,ntrim):
+    if abs(d31[i]-d31[i-1])>10:
+        c.append(d31[i])
+        d.append(i)
+    
+ax2.plot( d30[0:439]/10**15, d31[0:439] , '--', color = colorset[2],linewidth=2)
+ax2.plot( d30[446:635]/10**15, d31[446:635] , '--', color = colorset[2],linewidth=2)
+ax2.plot( d30[640:787]/10**15, d31[640:787] , '--', color = colorset[2],linewidth=2)
+ax2.plot( d30[788:ntrim]/10**15, d31[788:ntrim] , '--', color = colorset[2],linewidth=2)
+# ax2.plot( d30[0:ntrim]/10**15, d31[0:ntrim] , '--', color = colorset[2],linewidth=2)
+ax2.plot( d30[0:ntrim]/10**15, d32[0:ntrim] , color = colorset[2],linewidth=2,label='$b=-1$')
+
+line1=LineString(np.column_stack((d30[0:439]/10**15, d31[0:439])))
+line2=LineString(np.column_stack((d30[0:439]/10**15, d32[0:439])))
+intersection=line1.intersection(line2)
+ax2.plot(*intersection.xy,color='olive',markersize=10,marker='o')
+
+line1=LineString(np.column_stack((d30[446:635]/10**15, d31[446:635])))
+line2=LineString(np.column_stack((d30[446:635]/10**15, d32[446:635])))
+intersection=line1.intersection(line2)
+ax2.plot(*intersection.xy,color='olive',markersize=10,marker='o')
+
+line1=LineString(np.column_stack((d30[640:787]/10**15, d31[640:787])))
+line2=LineString(np.column_stack((d30[640:787]/10**15, d32[640:787])))
+intersection=line1.intersection(line2)
+ax2.plot(*intersection.xy,color='olive',markersize=10,marker='o')
 
 
 
 
+plt.xlim(min(d10)/10**15,d10[ntrim]/10**15)
+ax1.minorticks_on()
+ax2.minorticks_on()
+# print( '\n *** STG_solver uses %.2f seconds\n' % (timeit.time.time() - t0))
+ax1.legend(fontsize=20,frameon=False)
+ax2.legend(fontsize=20,frameon=False,loc='upper right')
 plt.savefig("fig_lin1.pdf", format='pdf', bbox_inches="tight")
-print( '\n *** STG_solver uses %.2f seconds\n' % (timeit.time.time() - t0))
-
 plt.show()
