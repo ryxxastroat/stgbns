@@ -54,24 +54,22 @@ hbar=const.hbar.cgs.value
 m_n=const.m_n.cgs.value
 km=10**5
 
-plt.close()
-
 fig, axs = plt.subplots(2, 4,figsize=(24,12),linewidth=2)
 colorset=['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple'] 
-plt.setp(axs, xticks=[0, 0.5, 1,1.5,2,2.5])
+#plt.setp(axs, xticks=[0, 0.5, 1,1.5,2,2.5])
 
-# GR plots
 for i in range(2):
     for j in range(4):
         for k in range(5):
             datagr=np.genfromtxt('TOV_5eqs_data'+str(k+1)+'.txt')
-            M=datagr[:,1]
-            I=datagr[:,4] 
-            axs[i,j].plot(M/Ms,I,color=colorset[k],linestyle='--',linewidth=2)
-            axs[i,j].set_ylim(24,62)
-            axs[i,j].set_xlim(0.4,2.6)
+            M=datagr[:,1]/MSUN
+            I=datagr[:,4]/1e45 
+            axs[i,j].plot(M,I,color=colorset[k],linestyle='--',linewidth=0.8)
+            #axs[i,j].set_ylim(24,62)
+            #axs[i,j].set_xlim(0.4,2.6)
             axs[i,j].minorticks_on()
-            
+
+       
 # the first plot
 for i in range(5):
     data=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+1)+'.txt')
@@ -80,10 +78,10 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    axs[0,0].plot(x21, y21, 'o', color = colorset[i],markersize=5) 
+    y21 = c421/1e45
+    axs[0,0].plot(x21, y21, color = colorset[i], linewidth=3) 
     
-
+  
 # the second plot
 list2=[26,27,28,30]
 for i in range(4):
@@ -94,15 +92,14 @@ for i in range(4):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421 
+    y21 = c421/1e45 
     if a!=30:
-        axs[0,1].plot(x21, y21, 'o', color = colorset[i],markersize=5) 
+        axs[0,1].plot(x21, y21, color = colorset[i], linewidth=5) 
    
     else:
-        axs[0,1].plot(x21, y21, 'o', color = colorset[i+1],markersize=5)  
+        axs[0,1].plot(x21, y21, color = colorset[i+1], linewidth=7)  
 
 # the third plot
-
 for i in range(5):
     data=np.genfromtxt('stgb_tid_v1_comb_data'+str(31+i)+'.txt')
     c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
@@ -110,17 +107,16 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    index=x21.argsort()
-    ydata=y21[index]
-    xdata=x21[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),5)
-    ys=s1(xs)
-    axs[0,2].plot(xs, ys, color = colorset[i],linewidth=2.5) 
-        
+    y21 = c421/1e45
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata), 20)
+    #ys=s1(xs)
+    axs[0,2].plot(x21, y21, color = colorset[i], linewidth=3) 
+         
 # the fourth plot
-
 for i in range(5):
     data=np.genfromtxt('stgb_tid_v1_comb_data'+str(36+i)+'.txt')
     c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
@@ -128,17 +124,17 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    index=x21.argsort()
-    ydata=y21[index]
-    xdata=x21[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),5)
-    ys=s1(xs)
-    axs[0,3].plot(xs, ys, color = colorset[i],linewidth=2.5) 
+    y21 = c421/1e45
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata),5)
+    #ys=s1(xs)
+    axs[0,3].plot(x21, y21, color = colorset[i], linewidth=3) 
+
 
 # the fifth plot
-
 for i in range(5):
     data=np.genfromtxt('stgb_tid_v1_comb_data'+str(1+i)+'.txt')
     c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
@@ -146,11 +142,10 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    axs[1,0].plot(x21, y21, 'o', color = colorset[i],markersize=5) 
+    y21 = c421/1e45
+    axs[1,0].plot(x21, y21, color = colorset[i], linewidth=3) 
       
 # the sixth plot
-
 for i in range(5):
     data=np.genfromtxt('stgb_tid_v1_comb_data'+str(6+i)+'.txt')
     c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
@@ -158,9 +153,9 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    axs[1,1].plot(x21, y21, 'o', color = colorset[i],markersize=5)  
-      
+    y21 = c421/1e45
+    axs[1,1].plot(x21, y21, color = colorset[i], linewidth=5)  
+    
 # the seventh plot
 for i in range(5):
     data=np.genfromtxt('stgb_tid_v1_comb_data'+str(11+i)+'.txt')
@@ -169,14 +164,14 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    index=x21.argsort()
-    ydata=y21[index]
-    xdata=x21[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),5)
-    ys=s1(xs)
-    axs[1,2].plot(xs, ys, color = colorset[i],linewidth=2.5) 
+    y21 = c421/1e45
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata),5)
+    #ys=s1(xs)
+    axs[1,2].plot(x21, y21, color = colorset[i], linewidth=3) 
       
 # the eighth plot
 for i in range(5):
@@ -186,26 +181,26 @@ for i in range(5):
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
-    y21 = c421
-    index=x21.argsort()
-    ydata=y21[index]
-    xdata=x21[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),5)
-    ys=s1(xs)
-    axs[1,3].plot(xs, ys, color = colorset[i],linewidth=2.5)
+    y21 = c421/1e45
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata),5)
+    #ys=s1(xs)
+    axs[1,3].plot(x21, y21, color = colorset[i], linewidth=3)
+           
             
-            
-axs[1,3].grid()           
+       
                       
-fig.text(0.08, 0.40,r'$I/M^{3/2}\,[\rm km^{2}/M_{\odot}^{1/2}]$'  , ha='center', fontsize=30,rotation='vertical')
+fig.text(0.08, 0.40,r'$I[\rm 10^{45} \, g\,cm^2]$'  , ha='center', fontsize=30,rotation='vertical')
 fig.text(0.48, 0.05, r'$M\,[{ \rm M_{\odot}}]$',fontsize=30)      
-fig.text(0.91, 0.7, r'$a=1$' ,fontsize=30, rotation='90')          
-fig.text(0.91, 0.27, r'$a=0.1$' ,fontsize=30, rotation='90')     
+fig.text(0.91, 0.7, r'$a=1$' ,fontsize=30, rotation='-90')          
+fig.text(0.91, 0.27, r'$a=0.1$' ,fontsize=30, rotation='-90')     
 fig.text(0.18, 0.9, r'$b=-1$' ,fontsize=30)     
 fig.text(0.38, 0.9, r'$b=-0.2$' ,fontsize=30)     
 fig.text(0.58, 0.9, r'$b=3$' ,fontsize=30)   
 fig.text(0.78, 0.9, r'$b=10$' ,fontsize=30)  
-plt.savefig("MOI.pdf", format='pdf', bbox_inches="tight")
+plt.savefig("fig_nonlin_MI.pdf", format='pdf', bbox_inches="tight")
 
 plt.show()

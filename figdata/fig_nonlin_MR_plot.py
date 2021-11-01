@@ -55,6 +55,7 @@ hbar=const.hbar.cgs.value
 m_n=const.m_n.cgs.value
 km=10**5
 
+label=['WFF1','SLy4','AP4', 'MPA1','PAL1']
 fig, axs = plt.subplots(2, 4,figsize=(24,12))
 colorset=['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple'] 
 plt.setp(axs, yticks=[0, 0.5, 1,1.5,2,2.5],xticks=[9,11,13,15])
@@ -65,7 +66,10 @@ for i in range(2):
             datagr=np.genfromtxt('TOV_5eqs_data'+str(k+1)+'.txt')
             M=datagr[:,1]
             R=datagr[:,2]
-            axs[i,j].plot(R/10**5,M/Ms,color=colorset[k],linestyle='--',linewidth=2)
+            if i==0 and j==0:
+              axs[i,j].plot(R/10**5,M/Ms,color=colorset[k],linestyle='--',linewidth=2, label=label[k])
+            else:
+              axs[i,j].plot(R/10**5,M/Ms,color=colorset[k],linestyle='--',linewidth=2)
             axs[i,j].set_ylim(0,2.6)
             axs[i,j].set_xlim(8.3,15)
             axs[i,j].minorticks_on()
@@ -133,7 +137,7 @@ for i in range(5):
         s1 = UnivariateSpline(ydata, xdata, s=5)
         ys=np.linspace(min(ydata),max(ydata),5)
         xs=s1(ys)
-        axs[0,2].plot(xs,ys, color = colorset[i],markersize=5,linewidth=2.5) 
+        axs[0,2].plot(xs,ys, color = colorset[i],markersize=5,linewidth=3) 
         
 # the fourth plot
 
@@ -158,7 +162,7 @@ for i in range(5):
         s1 = UnivariateSpline(ydata, xdata, s=5)
         ys=np.linspace(min(ydata),max(ydata),5)
         xs=s1(ys)
-        axs[0,3].plot(xs,ys, color = colorset[i],markersize=5,linewidth=2.5)
+        axs[0,3].plot(xs,ys, color = colorset[i],markersize=5,linewidth=3)
 
 # the fifth plot
 for i in range(5):
@@ -216,7 +220,7 @@ for i in range(5):
         s1 = UnivariateSpline(ydata, xdata, s=5)
         ys=np.linspace(min(ydata),max(ydata),5)
         xs=s1(ys)
-        axs[1,2].plot(xs,ys, color = colorset[i],markersize=5,linewidth=2.5)
+        axs[1,2].plot(xs,ys, color = colorset[i],markersize=5,linewidth=3)
         
 # the eighth plot
 for i in range(5):
@@ -240,9 +244,12 @@ for i in range(5):
         s1 = UnivariateSpline(ydata, xdata, s=5)
         ys=np.linspace(min(ydata),max(ydata),10)
         xs=s1(ys)
-        axs[1,3].plot(xs,ys, color = colorset[i],markersize=5,linewidth=2.5)
+        axs[1,3].plot(xs,ys, color = colorset[i],markersize=5,linewidth=3)
         
 # plot decorations and labels
+
+axs[0,0].legend(fontsize=13, frameon=False)
+
 
 fig.text(0.08, 0.5, r'$M\,[{\rm M_{\odot}}]$', ha='center', fontsize=30,rotation='vertical')
 fig.text(0.48, 0.05, r'$R\,[\rm km]$' ,fontsize=30)      
