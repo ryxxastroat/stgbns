@@ -72,7 +72,7 @@ for i in range(2):
        
 # the first plot
 for i in range(5):
-    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+1)+'.txt')
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+21)+'.txt')
     c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
     c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
     data[:, 4], data[:, 5], data[:, 6], data[:, 7], \

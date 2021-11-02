@@ -1,20 +1,57 @@
-"""
-v1_comb code: plot M-R
-"""
-
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import log10 as lg
+from numpy import pi as pi
+from scipy.interpolate import interp1d as sp_interp1d
+from scipy.integrate import odeint
+from scipy.integrate import ode
+import warnings
+import timeit
+import scipy.optimize as opt
+from matplotlib import cm
+from astropy import constants as const
+from astropy import units as u
+plt.rcParams['xtick.labelsize'] = 25
+plt.rcParams['ytick.labelsize'] = 25
+plt.rcParams['xtick.direction'] = 'in'
+plt.rcParams['ytick.direction'] = 'in'
+plt.rcParams['xtick.major.size'] = 8
+plt.rcParams['ytick.major.size'] = 8
+plt.rcParams['xtick.minor.size'] = 4
+plt.rcParams['ytick.minor.size'] = 4
+plt.rcParams['xtick.top'] = True
+plt.rcParams['ytick.right'] = True
+plt.rcParams['axes.labelpad'] = 8.0
+plt.rcParams['figure.constrained_layout.h_pad'] = 0
+plt.rcParams['text.usetex'] = True
+plt.rc('text', usetex=True)
+plt.rcParams['font.sans-serif'] = ['Times New Roman']
+plt.tick_params(axis='both', which='minor', labelsize=18)
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+                               AutoMinorLocator)
 import sys
 import warnings
 import timeit
-import numpy as np
 import scipy.optimize
-from numpy import pi
-import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy.integrate import ode as sp_ode
-from scipy.optimize import curve_fit
-
 
 t0 = timeit.time.time()
+from shapely.geometry import LineString
+from scipy.interpolate import UnivariateSpline
+G=const.G.cgs.value
+c=const.c.cgs.value
+MSUN=const.M_sun.cgs.value
+hbar=const.hbar.cgs.value
+m_n=const.m_n.cgs.value
+KM=10**5
+import math
+
+
+Ms=const.M_sun.cgs.value
+hbar=const.hbar.cgs.value
+m_n=const.m_n.cgs.value
+km=10**5
 
 PI4 = 4.0 * pi
 ka = 8.0 * pi
@@ -39,16 +76,31 @@ def Idiml(i):
     return i*G/c**2 / runit**3
     
     
-        
-
+fig, axs = plt.subplots(2, 4,figsize=(24,12),linewidth=2)
 colorset=['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple'] 
+#plt.setp(axs, xticks=[0, 0.5, 1,1.5,2,2.5])
 
-# ec, M, R, dimllatidal, y
+axs[0,0].set_ylim(3,20)
+axs[0,1].set_ylim(3,20)
+axs[0,2].set_ylim(3,1e2)
+axs[0,3].set_ylim(3,1e2)
+axs[1,0].set_ylim(3,20)
+axs[1,1].set_ylim(3,20)
+axs[1,2].set_ylim(3,1e2)
+axs[1,3].set_ylim(3,1e2)
+axs[0,0].set_xlim(1,1e4)
+axs[0,1].set_xlim(1,1e4)
+axs[0,2].set_xlim(1,1e6)
+axs[0,3].set_xlim(1,1e6)
+axs[1,0].set_xlim(1,1e4)
+axs[1,1].set_xlim(1,1e4)
+axs[1,2].set_xlim(1,1e6)
+axs[1,3].set_xlim(1,1e6)
+
+#axs[0,0].gca().yaxis.set_major_formatter(ticker.ScalarFormatter())
+
 ldata1 = np.genfromtxt('TOV_tidal_v1_data3.txt')
 a10, a11, a12, a13, a14 = ldata1[:, 0], ldata1[:, 1], ldata1[:, 2], ldata1[:, 3], ldata1[:, 4]
-
-
- 
 def poly4f(x, a, b, c, d, e):
    return a + b*x + c*x**2 + d*x**3 + e*x**4
 
@@ -62,259 +114,154 @@ yset1 = poly4f(xset, 1.493, 0.06433, 0.02104, -0.0005637, 3.947e-6)   # Rui's fi
 xexpset = np.exp(xset)
 yexpset = np.exp(yset)
 yexpset1 = np.exp(yset1)
+axs[0,0].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[0,1].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[0,2].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[0,3].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[1,0].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[1,1].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[1,2].loglog(xexpset, yexpset1, '--', color = 'black')
+axs[1,3].loglog(xexpset, yexpset1, '--', color = 'black')
+
+ntrim1set=[13, 16, 14, 15, 14]
+ntrim2set=[22, 20, 16, 20]
+ntrim3set=[17, 17, 18, 16, 14]
+ntrim4set=[18, 14, 9, 16, 13]
+ntrim5set=[18, 13, 12, 18, 13]
+ntrim6set=[21, 21, 21, 24, 23]
+
+       
+# the first plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+21)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c921[0:ntrim1set[i]] 
+    y21 = Idiml(c421[0:ntrim1set[i]])/(mdiml(c321[0:ntrim1set[i]]))**3
+    axs[0,0].plot(x21, y21, color = colorset[i], linewidth=3) 
+    
+  
+# the second plot
+list2=[26,27,28,30]
+for i in range(4):
+    a=list2[i]
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(list2[i])+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c921[0:ntrim2set[i]]
+    y21 = Idiml(c421[0:ntrim2set[i]])/(mdiml(c321[0:ntrim2set[i]]))**3
+    if a!=30:
+        axs[0,1].plot(x21, y21, color = colorset[i], linewidth=5) 
+   
+    else:
+        axs[0,1].plot(x21, y21, color = colorset[i+1], linewidth=7)  
+
+# the third plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(31+i)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c921[0:ntrim3set[i]] 
+    y21 = Idiml(c421[0:ntrim3set[i]])/(mdiml(c321[0:ntrim3set[i]]))**3
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata), 20)
+    #ys=s1(xs)
+    axs[0,2].plot(x21, y21, color = colorset[i], linewidth=3) 
+         
+# the fourth plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(36+i)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c921[0:ntrim4set[i]] 
+    y21 = Idiml(c421[0:ntrim4set[i]])/(mdiml(c321[0:ntrim4set[i]]))**3
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata),5)
+    #ys=s1(xs)
+    axs[0,3].plot(x21, y21, color = colorset[i], linewidth=3) 
 
 
-fig = plt.figure(figsize=(24,12))
-ax1 = fig.add_subplot(241)
-ax1 = fig.add_subplot(241)
-ax2 = fig.add_subplot(242)
-ax3 = fig.add_subplot(243)
-ax4 = fig.add_subplot(244)
-ax5 = fig.add_subplot(245)
-ax6 = fig.add_subplot(246)
-ax7 = fig.add_subplot(247)
-ax8 = fig.add_subplot(248)
+# the fifth plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(1+i)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c721[0:ntrim5set[i]] 
+    y21 = Idiml(c421[0:ntrim5set[i]])/(mdiml(c321[0:ntrim5set[i]]))**3
+    axs[1,0].plot(x21, y21, color = colorset[i], linewidth=3) 
+      
+# the sixth plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(6+i)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c721[0:ntrim6set[i]] 
+    y21 = Idiml(c421[0:ntrim6set[i]])/(mdiml(c321[0:ntrim6set[i]]))**3
+    axs[1,1].plot(x21, y21, color = colorset[i], linewidth=5)  
+    
+# the seventh plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(11+i)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c721 
+    y21 = Idiml(c421)/(mdiml(c321))**3
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata),5)
+    #ys=s1(xs)
+    axs[1,2].plot(x21, y21, color = colorset[i], linewidth=3) 
+      
+# the eighth plot
+for i in range(5):
+    data=np.genfromtxt('stgb_tid_v1_comb_data'+str(16+i)+'.txt')
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
+    c1021=data[:, 0], data[:, 1], data[:, 2], data[:, 3], \
+    data[:, 4], data[:, 5], data[:, 6], data[:, 7], \
+    data[:, 8], data[:, 9], data[:, 10] 
+    x21 = c721 
+    y21 = Idiml(c421)/(mdiml(c321))**3
+    #index=x21.argsort()
+    #ydata=y21[index]
+    #xdata=x21[index]
+    #s1 = UnivariateSpline(xdata, ydata, s=5)
+    #xs=np.linspace(min(xdata),max(xdata),5)
+    #ys=s1(xs)
+    axs[1,3].plot(x21, y21, color = colorset[i], linewidth=3)
+           
+            
+       
+                      
+fig.text(0.08, 0.40,r'$I/M^3$'  , ha='center', fontsize=30,rotation='vertical')
+fig.text(0.48, 0.05, r'$\lambda/M^5$',fontsize=30)      
+fig.text(0.91, 0.7, r'$a=1$' ,fontsize=30, rotation='-90')          
+fig.text(0.91, 0.27, r'$a=0.1$' ,fontsize=30, rotation='-90')     
+fig.text(0.18, 0.9, r'$b=-1$' ,fontsize=30)     
+fig.text(0.38, 0.9, r'$b=-0.2$' ,fontsize=30)     
+fig.text(0.58, 0.9, r'$b=3$' ,fontsize=30)   
+fig.text(0.78, 0.9, r'$b=10$' ,fontsize=30)  
+plt.savefig("fig_nonlin_MI.pdf", format='pdf', bbox_inches="tight")
 
-
-
-# GR I-tidal
-"""
-ax1.plot(xexpset, yexpset, '--', color = colorset[0], label='$a$ = 1')
-ax1.plot(xexpset, yexpset1, '--', color = colorset[1])
-ax2.plot(xset, yset, '--', color = colorset[0], label='$a$ = 1')
-ax2.plot(xset, yset1, '--', color = colorset[1])
-ax3.semilogx(xexpset, yexpset, '--', color = colorset[0], label='$a$ = 1')
-ax3.semilogx(xexpset, yexpset1, '--', color = colorset[1])
-ax4.loglog(xexpset, yexpset, '--', color = colorset[0], label='$a$ = 1')
-ax4.loglog(xexpset, yexpset1, '--', color = colorset[1])
-"""
-ax1.loglog(xexpset, yexpset1, '--', color = 'black', label='$a$ = 1')
-ax2.loglog(xexpset, yexpset1, '--', color = 'black')
-ax3.loglog(xexpset, yexpset1, '--', color = 'black')
-ax4.loglog(xexpset, yexpset1, '--', color = 'black')
-ax5.loglog(xexpset, yexpset1, '--', color = 'black', label='$a$ = 0.1')
-ax6.loglog(xexpset, yexpset1, '--', color = 'black')
-ax7.loglog(xexpset, yexpset1, '--', color = 'black')
-ax8.loglog(xexpset, yexpset1, '--', color = 'black')
-
-#ax3.set_xscale('symlog')
-#ax3.set_yscale('log')
-
-ax1.legend()
-ax5.legend()
-
-
-
-
-
-stdata1= np.genfromtxt('stgb_tid_v1_comb_data1.txt') 
-c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0], stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4], stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
-x1 = c71 
-y1 = Idiml(c41)/(mdiml(c31))**3 
-ax5.loglog(x1, y1, 'o', color = colorset[0]) 
-stdata2= np.genfromtxt('stgb_tid_v1_comb_data2.txt') 
-c02, c12, c22, c32, c42, c52, c62, c72, c82, c92, c102=stdata2[:, 0], stdata2[:, 1], stdata2[:, 2], stdata2[:, 3], stdata2[:, 4], stdata2[:, 5], stdata2[:, 6], stdata2[:, 7], stdata2[:, 8], stdata2[:, 9], stdata2[:, 10] 
-x2 = c72 
-y2 = Idiml(c42)/(mdiml(c32))**3 
-ax5.loglog(x2, y2, 'o', color = colorset[1]) 
-stdata3= np.genfromtxt('stgb_tid_v1_comb_data3.txt') 
-c03, c13, c23, c33, c43, c53, c63, c73, c83, c93, c103=stdata3[:, 0], stdata3[:, 1], stdata3[:, 2], stdata3[:, 3], stdata3[:, 4], stdata3[:, 5], stdata3[:, 6], stdata3[:, 7], stdata3[:, 8], stdata3[:, 9], stdata3[:, 10] 
-x3 = c73 
-y3 = Idiml(c43)/(mdiml(c33))**3 
-ax5.loglog(x3, y3, 'o', color = colorset[2]) 
-stdata4= np.genfromtxt('stgb_tid_v1_comb_data4.txt') 
-c04, c14, c24, c34, c44, c54, c64, c74, c84, c94, c104=stdata4[:, 0], stdata4[:, 1], stdata4[:, 2], stdata4[:, 3], stdata4[:, 4], stdata4[:, 5], stdata4[:, 6], stdata4[:, 7], stdata4[:, 8], stdata4[:, 9], stdata4[:, 10] 
-x4 = c74 
-y4 = Idiml(c44)/(mdiml(c34))**3 
-ax5.loglog(x4, y4, 'o', color = colorset[3]) 
-stdata5= np.genfromtxt('stgb_tid_v1_comb_data5.txt') 
-c05, c15, c25, c35, c45, c55, c65, c75, c85, c95, c105=stdata5[:, 0], stdata5[:, 1], stdata5[:, 2], stdata5[:, 3], stdata5[:, 4], stdata5[:, 5], stdata5[:, 6], stdata5[:, 7], stdata5[:, 8], stdata5[:, 9], stdata5[:, 10] 
-x5 = c75 
-y5 = Idiml(c45)/(mdiml(c35))**3 
-ax5.loglog(x5, y5, 'o', color = colorset[4]) 
-stdata6= np.genfromtxt('stgb_tid_v1_comb_data6.txt') 
-c06, c16, c26, c36, c46, c56, c66, c76, c86, c96, c106=stdata6[:, 0], stdata6[:, 1], stdata6[:, 2], stdata6[:, 3], stdata6[:, 4], stdata6[:, 5], stdata6[:, 6], stdata6[:, 7], stdata6[:, 8], stdata6[:, 9], stdata6[:, 10] 
-x6 = c76 
-y6 = Idiml(c46)/(mdiml(c36))**3 
-ax6.loglog(x6, y6, 'o', color = colorset[0]) 
-stdata7= np.genfromtxt('stgb_tid_v1_comb_data7.txt') 
-c07, c17, c27, c37, c47, c57, c67, c77, c87, c97, c107=stdata7[:, 0], stdata7[:, 1], stdata7[:, 2], stdata7[:, 3], stdata7[:, 4], stdata7[:, 5], stdata7[:, 6], stdata7[:, 7], stdata7[:, 8], stdata7[:, 9], stdata7[:, 10] 
-x7 = c77 
-y7 = Idiml(c47)/(mdiml(c37))**3 
-ax6.loglog(x7, y7, 'o', color = colorset[1]) 
-stdata8= np.genfromtxt('stgb_tid_v1_comb_data8.txt') 
-c08, c18, c28, c38, c48, c58, c68, c78, c88, c98, c108=stdata8[:, 0], stdata8[:, 1], stdata8[:, 2], stdata8[:, 3], stdata8[:, 4], stdata8[:, 5], stdata8[:, 6], stdata8[:, 7], stdata8[:, 8], stdata8[:, 9], stdata8[:, 10] 
-x8 = c78 
-y8 = Idiml(c48)/(mdiml(c38))**3 
-ax6.loglog(x8, y8, 'o', color = colorset[2]) 
-stdata9= np.genfromtxt('stgb_tid_v1_comb_data9.txt') 
-c09, c19, c29, c39, c49, c59, c69, c79, c89, c99, c109=stdata9[:, 0], stdata9[:, 1], stdata9[:, 2], stdata9[:, 3], stdata9[:, 4], stdata9[:, 5], stdata9[:, 6], stdata9[:, 7], stdata9[:, 8], stdata9[:, 9], stdata9[:, 10] 
-x9 = c79 
-y9 = Idiml(c49)/(mdiml(c39))**3 
-ax6.loglog(x9, y9, 'o', color = colorset[3]) 
-stdata10= np.genfromtxt('stgb_tid_v1_comb_data10.txt') 
-c010, c110, c210, c310, c410, c510, c610, c710, c810, c910, c1010=stdata10[:, 0], stdata10[:, 1], stdata10[:, 2], stdata10[:, 3], stdata10[:, 4], stdata10[:, 5], stdata10[:, 6], stdata10[:, 7], stdata10[:, 8], stdata10[:, 9], stdata10[:, 10] 
-x10 = c710 
-y10 = Idiml(c410)/(mdiml(c310))**3 
-ax6.loglog(x10, y10, 'o', color = colorset[4]) 
-stdata11= np.genfromtxt('stgb_tid_v1_comb_data11.txt') 
-c011, c111, c211, c311, c411, c511, c611, c711, c811, c911, c1011=stdata11[:, 0], stdata11[:, 1], stdata11[:, 2], stdata11[:, 3], stdata11[:, 4], stdata11[:, 5], stdata11[:, 6], stdata11[:, 7], stdata11[:, 8], stdata11[:, 9], stdata11[:, 10] 
-x11 = c711 
-y11 = Idiml(c411)/(mdiml(c311))**3 
-ax7.loglog(x11, y11, 'o', color = colorset[0]) 
-stdata12= np.genfromtxt('stgb_tid_v1_comb_data12.txt') 
-c012, c112, c212, c312, c412, c512, c612, c712, c812, c912, c1012=stdata12[:, 0], stdata12[:, 1], stdata12[:, 2], stdata12[:, 3], stdata12[:, 4], stdata12[:, 5], stdata12[:, 6], stdata12[:, 7], stdata12[:, 8], stdata12[:, 9], stdata12[:, 10] 
-x12 = c712 
-y12 = Idiml(c412)/(mdiml(c312))**3 
-ax7.loglog(x12, y12, 'o', color = colorset[1]) 
-stdata13= np.genfromtxt('stgb_tid_v1_comb_data13.txt') 
-c013, c113, c213, c313, c413, c513, c613, c713, c813, c913, c1013=stdata13[:, 0], stdata13[:, 1], stdata13[:, 2], stdata13[:, 3], stdata13[:, 4], stdata13[:, 5], stdata13[:, 6], stdata13[:, 7], stdata13[:, 8], stdata13[:, 9], stdata13[:, 10] 
-x13 = c713 
-y13 = Idiml(c413)/(mdiml(c313))**3 
-ax7.loglog(x13, y13, 'o', color = colorset[2]) 
-stdata14= np.genfromtxt('stgb_tid_v1_comb_data14.txt') 
-c014, c114, c214, c314, c414, c514, c614, c714, c814, c914, c1014=stdata14[:, 0], stdata14[:, 1], stdata14[:, 2], stdata14[:, 3], stdata14[:, 4], stdata14[:, 5], stdata14[:, 6], stdata14[:, 7], stdata14[:, 8], stdata14[:, 9], stdata14[:, 10] 
-x14 = c714 
-y14 = Idiml(c414)/(mdiml(c314))**3 
-ax7.loglog(x14, y14, 'o', color = colorset[3]) 
-stdata15= np.genfromtxt('stgb_tid_v1_comb_data15.txt') 
-c015, c115, c215, c315, c415, c515, c615, c715, c815, c915, c1015=stdata15[:, 0], stdata15[:, 1], stdata15[:, 2], stdata15[:, 3], stdata15[:, 4], stdata15[:, 5], stdata15[:, 6], stdata15[:, 7], stdata15[:, 8], stdata15[:, 9], stdata15[:, 10] 
-x15 = c715 
-y15 = Idiml(c415)/(mdiml(c315))**3 
-ax7.loglog(x15, y15, 'o', color = colorset[4]) 
-stdata16= np.genfromtxt('stgb_tid_v1_comb_data16.txt') 
-c016, c116, c216, c316, c416, c516, c616, c716, c816, c916, c1016=stdata16[:, 0], stdata16[:, 1], stdata16[:, 2], stdata16[:, 3], stdata16[:, 4], stdata16[:, 5], stdata16[:, 6], stdata16[:, 7], stdata16[:, 8], stdata16[:, 9], stdata16[:, 10] 
-x16 = c716 
-y16 = Idiml(c416)/(mdiml(c316))**3 
-ax8.loglog(x16, y16, 'o', color = colorset[0]) 
-stdata17= np.genfromtxt('stgb_tid_v1_comb_data17.txt') 
-c017, c117, c217, c317, c417, c517, c617, c717, c817, c917, c1017=stdata17[:, 0], stdata17[:, 1], stdata17[:, 2], stdata17[:, 3], stdata17[:, 4], stdata17[:, 5], stdata17[:, 6], stdata17[:, 7], stdata17[:, 8], stdata17[:, 9], stdata17[:, 10] 
-x17 = c717 
-y17 = Idiml(c417)/(mdiml(c317))**3 
-ax8.loglog(x17, y17, 'o', color = colorset[1]) 
-stdata18= np.genfromtxt('stgb_tid_v1_comb_data18.txt') 
-c018, c118, c218, c318, c418, c518, c618, c718, c818, c918, c1018=stdata18[:, 0], stdata18[:, 1], stdata18[:, 2], stdata18[:, 3], stdata18[:, 4], stdata18[:, 5], stdata18[:, 6], stdata18[:, 7], stdata18[:, 8], stdata18[:, 9], stdata18[:, 10] 
-x18 = c718 
-y18 = Idiml(c418)/(mdiml(c318))**3 
-ax8.loglog(x18, y18, 'o', color = colorset[2]) 
-stdata19= np.genfromtxt('stgb_tid_v1_comb_data19.txt') 
-c019, c119, c219, c319, c419, c519, c619, c719, c819, c919, c1019=stdata19[:, 0], stdata19[:, 1], stdata19[:, 2], stdata19[:, 3], stdata19[:, 4], stdata19[:, 5], stdata19[:, 6], stdata19[:, 7], stdata19[:, 8], stdata19[:, 9], stdata19[:, 10] 
-x19 = c719 
-y19 = Idiml(c419)/(mdiml(c319))**3 
-ax8.loglog(x19, y19, 'o', color = colorset[3]) 
-stdata20= np.genfromtxt('stgb_tid_v1_comb_data20.txt') 
-c020, c120, c220, c320, c420, c520, c620, c720, c820, c920, c1020=stdata20[:, 0], stdata20[:, 1], stdata20[:, 2], stdata20[:, 3], stdata20[:, 4], stdata20[:, 5], stdata20[:, 6], stdata20[:, 7], stdata20[:, 8], stdata20[:, 9], stdata20[:, 10] 
-x20 = c720 
-y20 = Idiml(c420)/(mdiml(c320))**3 
-ax8.loglog(x20, y20, 'o', color = colorset[4]) 
-
-
-stdata21= np.genfromtxt('stgb_tid_v1_comb_data21.txt') 
-c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2], stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6], stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
-x21 = c921 
-y21 = Idiml(c421)/(mdiml(c321))**3 
-ax1.loglog(x21, y21, 'o', color = colorset[0]) 
-stdata22= np.genfromtxt('stgb_tid_v1_comb_data22.txt') 
-c022, c122, c222, c322, c422, c522, c622, c722, c822, c922, c1022=stdata22[:, 0], stdata22[:, 1], stdata22[:, 2], stdata22[:, 3], stdata22[:, 4], stdata22[:, 5], stdata22[:, 6], stdata22[:, 7], stdata22[:, 8], stdata22[:, 9], stdata22[:, 10] 
-x22 = c922 
-y22 = Idiml(c422)/(mdiml(c322))**3 
-ax1.loglog(x22, y22, 'o', color = colorset[1]) 
-stdata23= np.genfromtxt('stgb_tid_v1_comb_data23.txt') 
-c023, c123, c223, c323, c423, c523, c623, c723, c823, c923, c1023=stdata23[:, 0], stdata23[:, 1], stdata23[:, 2], stdata23[:, 3], stdata23[:, 4], stdata23[:, 5], stdata23[:, 6], stdata23[:, 7], stdata23[:, 8], stdata23[:, 9], stdata23[:, 10] 
-x23 = c923 
-y23 = Idiml(c423)/(mdiml(c323))**3 
-ax1.loglog(x23, y23, 'o', color = colorset[2]) 
-stdata24= np.genfromtxt('stgb_tid_v1_comb_data24.txt') 
-c024, c124, c224, c324, c424, c524, c624, c724, c824, c924, c1024=stdata24[:, 0], stdata24[:, 1], stdata24[:, 2], stdata24[:, 3], stdata24[:, 4], stdata24[:, 5], stdata24[:, 6], stdata24[:, 7], stdata24[:, 8], stdata24[:, 9], stdata24[:, 10] 
-x24 = c924 
-y24 = Idiml(c424)/(mdiml(c324))**3 
-ax1.loglog(x24, y24, 'o', color = colorset[3]) 
-stdata25= np.genfromtxt('stgb_tid_v1_comb_data25.txt') 
-c025, c125, c225, c325, c425, c525, c625, c725, c825, c925, c1025=stdata25[:, 0], stdata25[:, 1], stdata25[:, 2], stdata25[:, 3], stdata25[:, 4], stdata25[:, 5], stdata25[:, 6], stdata25[:, 7], stdata25[:, 8], stdata25[:, 9], stdata25[:, 10] 
-x25 = c925 
-y25 = Idiml(c425)/(mdiml(c325))**3 
-ax1.loglog(x25, y25, 'o', color = colorset[4]) 
-stdata26= np.genfromtxt('stgb_tid_v1_comb_data26.txt') 
-c026, c126, c226, c326, c426, c526, c626, c726, c826, c926, c1026=stdata26[:, 0], stdata26[:, 1], stdata26[:, 2], stdata26[:, 3], stdata26[:, 4], stdata26[:, 5], stdata26[:, 6], stdata26[:, 7], stdata26[:, 8], stdata26[:, 9], stdata26[:, 10] 
-x26 = c926 
-y26 = Idiml(c426)/(mdiml(c326))**3 
-ax2.loglog(x26, y26, 'o', color = colorset[0]) 
-stdata27= np.genfromtxt('stgb_tid_v1_comb_data27.txt') 
-c027, c127, c227, c327, c427, c527, c627, c727, c827, c927, c1027=stdata27[:, 0], stdata27[:, 1], stdata27[:, 2], stdata27[:, 3], stdata27[:, 4], stdata27[:, 5], stdata27[:, 6], stdata27[:, 7], stdata27[:, 8], stdata27[:, 9], stdata27[:, 10] 
-x27 = c927 
-y27 = Idiml(c427)/(mdiml(c327))**3 
-ax2.loglog(x27, y27, 'o', color = colorset[1]) 
-stdata28= np.genfromtxt('stgb_tid_v1_comb_data28.txt') 
-c028, c128, c228, c328, c428, c528, c628, c728, c828, c928, c1028=stdata28[:, 0], stdata28[:, 1], stdata28[:, 2], stdata28[:, 3], stdata28[:, 4], stdata28[:, 5], stdata28[:, 6], stdata28[:, 7], stdata28[:, 8], stdata28[:, 9], stdata28[:, 10] 
-x28 = c928 
-y28 = Idiml(c428)/(mdiml(c328))**3 
-ax2.loglog(x28, y28, 'o', color = colorset[2]) 
-stdata30= np.genfromtxt('stgb_tid_v1_comb_data30.txt') 
-c030, c130, c230, c330, c430, c530, c630, c730, c830, c930, c1030=stdata30[:, 0], stdata30[:, 1], stdata30[:, 2], stdata30[:, 3], stdata30[:, 4], stdata30[:, 5], stdata30[:, 6], stdata30[:, 7], stdata30[:, 8], stdata30[:, 9], stdata30[:, 10] 
-x30 = c930 
-y30 = Idiml(c430)/(mdiml(c330))**3 
-ax2.loglog(x30, y30, 'o', color = colorset[4]) 
-
-ntrim31, ntrim32, ntrim33, ntrim34, ntrim35, ntrim36, ntrim37, ntrim38, ntrim39, ntrim40 = 17, 17, 18, 16, 14, 18, 14, 9, 16, 13
-
-stdata31= np.genfromtxt('stgb_tid_v1_comb_data31.txt') 
-c031, c131, c231, c331, c431, c531, c631, c731, c831, c931, c1031=stdata31[:, 0], stdata31[:, 1], stdata31[:, 2], stdata31[:, 3], stdata31[:, 4], stdata31[:, 5], stdata31[:, 6], stdata31[:, 7], stdata31[:, 8], stdata31[:, 9], stdata31[:, 10] 
-x31 = c931 
-y31 = Idiml(c431)/(mdiml(c331))**3 
-ax3.loglog(x31[:ntrim31], y31[:ntrim31], 'o', color = colorset[0]) 
-stdata32= np.genfromtxt('stgb_tid_v1_comb_data32.txt') 
-c032, c132, c232, c332, c432, c532, c632, c732, c832, c932, c1032=stdata32[:, 0], stdata32[:, 1], stdata32[:, 2], stdata32[:, 3], stdata32[:, 4], stdata32[:, 5], stdata32[:, 6], stdata32[:, 7], stdata32[:, 8], stdata32[:, 9], stdata32[:, 10] 
-x32 = c932 
-y32 = Idiml(c432)/(mdiml(c332))**3 
-ax3.loglog(x32[:ntrim32], y32[:ntrim32], 'o', color = colorset[1]) 
-stdata33= np.genfromtxt('stgb_tid_v1_comb_data33.txt') 
-c033, c133, c233, c333, c433, c533, c633, c733, c833, c933, c1033=stdata33[:, 0], stdata33[:, 1], stdata33[:, 2], stdata33[:, 3], stdata33[:, 4], stdata33[:, 5], stdata33[:, 6], stdata33[:, 7], stdata33[:, 8], stdata33[:, 9], stdata33[:, 10] 
-x33 = c933 
-y33 = Idiml(c433)/(mdiml(c333))**3 
-ax3.loglog(x33[:ntrim33], y33[:ntrim33], 'o', color = colorset[2]) 
-stdata34= np.genfromtxt('stgb_tid_v1_comb_data34.txt') 
-c034, c134, c234, c334, c434, c534, c634, c734, c834, c934, c1034=stdata34[:, 0], stdata34[:, 1], stdata34[:, 2], stdata34[:, 3], stdata34[:, 4], stdata34[:, 5], stdata34[:, 6], stdata34[:, 7], stdata34[:, 8], stdata34[:, 9], stdata34[:, 10] 
-x34 = c934 
-y34 = Idiml(c434)/(mdiml(c334))**3 
-ax3.loglog(x34[:ntrim34], y34[:ntrim34], 'o', color = colorset[3]) 
-stdata35= np.genfromtxt('stgb_tid_v1_comb_data35.txt') 
-c035, c135, c235, c335, c435, c535, c635, c735, c835, c935, c1035=stdata35[:, 0], stdata35[:, 1], stdata35[:, 2], stdata35[:, 3], stdata35[:, 4], stdata35[:, 5], stdata35[:, 6], stdata35[:, 7], stdata35[:, 8], stdata35[:, 9], stdata35[:, 10] 
-x35 = c935 
-y35 = Idiml(c435)/(mdiml(c335))**3 
-ax3.loglog(x35[:ntrim35], y35[:ntrim35], 'o', color = colorset[4]) 
-
-stdata36= np.genfromtxt('stgb_tid_v1_comb_data36.txt') 
-c036, c136, c236, c336, c436, c536, c636, c736, c836, c936, c1036=stdata36[:, 0], stdata36[:, 1], stdata36[:, 2], stdata36[:, 3], stdata36[:, 4], stdata36[:, 5], stdata36[:, 6], stdata36[:, 7], stdata36[:, 8], stdata36[:, 9], stdata36[:, 10] 
-x36 = c936 
-y36 = Idiml(c436)/(mdiml(c336))**3 
-ax4.loglog(x36[:ntrim36], y36[:ntrim36], 'o', color = colorset[0]) 
-stdata37= np.genfromtxt('stgb_tid_v1_comb_data37.txt') 
-c037, c137, c237, c337, c437, c537, c637, c737, c837, c937, c1037=stdata37[:, 0], stdata37[:, 1], stdata37[:, 2], stdata37[:, 3], stdata37[:, 4], stdata37[:, 5], stdata37[:, 6], stdata37[:, 7], stdata37[:, 8], stdata37[:, 9], stdata37[:, 10] 
-x37 = c937 
-y37 = Idiml(c437)/(mdiml(c337))**3 
-ax4.loglog(x37[:ntrim37], y37[:ntrim37], 'o', color = colorset[1]) 
-stdata38= np.genfromtxt('stgb_tid_v1_comb_data38.txt') 
-c038, c138, c238, c338, c438, c538, c638, c738, c838, c938, c1038=stdata38[:, 0], stdata38[:, 1], stdata38[:, 2], stdata38[:, 3], stdata38[:, 4], stdata38[:, 5], stdata38[:, 6], stdata38[:, 7], stdata38[:, 8], stdata38[:, 9], stdata38[:, 10] 
-x38 = c938 
-y38 = Idiml(c438)/(mdiml(c338))**3 
-ax4.loglog(x38[:ntrim38], y38[:ntrim38], 'o', color = colorset[2]) 
-stdata39= np.genfromtxt('stgb_tid_v1_comb_data39.txt') 
-c039, c139, c239, c339, c439, c539, c639, c739, c839, c939, c1039=stdata39[:, 0], stdata39[:, 1], stdata39[:, 2], stdata39[:, 3], stdata39[:, 4], stdata39[:, 5], stdata39[:, 6], stdata39[:, 7], stdata39[:, 8], stdata39[:, 9], stdata39[:, 10] 
-x39 = c939 
-y39 = Idiml(c439)/(mdiml(c339))**3 
-ax4.loglog(x39[:ntrim39], y39[:ntrim39], 'o', color = colorset[3]) 
-stdata40= np.genfromtxt('stgb_tid_v1_comb_data40.txt') 
-c040, c140, c240, c340, c440, c540, c640, c740, c840, c940, c1040=stdata40[:, 0], stdata40[:, 1], stdata40[:, 2], stdata40[:, 3], stdata40[:, 4], stdata40[:, 5], stdata40[:, 6], stdata40[:, 7], stdata40[:, 8], stdata40[:, 9], stdata40[:, 10] 
-x40 = c940 
-y40 = Idiml(c440)/(mdiml(c340))**3 
-ax4.loglog(x40[:ntrim40], y40[:ntrim40], 'o', color = colorset[4]) 
-
-
-
-
-
-plt.savefig("fig_nonlin_Itidal.pdf", format='pdf', bbox_inches="tight")
-print( '\n *** STG_solver uses %.2f seconds\n' % (timeit.time.time() - t0))
-
-plt.show() 
-
+plt.show()
