@@ -58,6 +58,24 @@ fig, axs = plt.subplots(2, 4,figsize=(24,12),linewidth=2)
 colorset=['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple'] 
 #plt.setp(axs, xticks=[0, 0.5, 1,1.5,2,2.5])
 
+axs[0,0].set_ylim(0.3,3.4)
+axs[0,1].set_ylim(0.3,3.4)
+axs[0,2].set_ylim(0, 3.4)
+axs[0,3].set_ylim(0, 3.4)
+axs[1,0].set_ylim(0.3,3.4)
+axs[1,1].set_ylim(0.3,3.4)
+axs[1,2].set_ylim(0, 3.4)
+axs[1,3].set_ylim(0, 3.4)
+axs[0,0].set_xlim(0.7, 2.5)
+axs[0,1].set_xlim(0.7, 2.5)
+axs[0,2].set_xlim(0.3, 2.5)
+axs[0,3].set_xlim(0.3, 2.5)
+axs[1,0].set_xlim(0.7, 2.5)
+axs[1,1].set_xlim(0.7, 2.5)
+axs[1,2].set_xlim(0.3, 2.5)
+axs[1,3].set_xlim(0.3, 2.5)
+
+
 for i in range(2):
     for j in range(4):
         for k in range(5):
@@ -65,10 +83,10 @@ for i in range(2):
             M=datagr[:,1]/MSUN
             I=datagr[:,4]/1e45 
             axs[i,j].plot(M,I,color=colorset[k],linestyle='--',linewidth=0.8)
-            #axs[i,j].set_ylim(24,62)
-            #axs[i,j].set_xlim(0.4,2.6)
-            axs[i,j].minorticks_on()
-
+            axs[i,j].xaxis.set_major_locator(MultipleLocator(0.5))            
+            axs[i,j].xaxis.set_minor_locator(MultipleLocator(0.1))
+            axs[i,j].yaxis.set_minor_locator(MultipleLocator(0.2))
+            
        
 # the first plot
 for i in range(5):
