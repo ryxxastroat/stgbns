@@ -77,12 +77,12 @@ stn1 = len(stdata1)
 ntrim = 900
 
 # ec, interior ph_r/ph, exterior ph_r/ph
-d10, d11, d12 = stdata1[:, 0], stdata1[:, 1], stdata1[:, 2]
-d20, d21, d22 = stdata2[:, 0], stdata2[:, 1], stdata2[:, 2]
-d30, d31, d32 = stdata3[:, 0], stdata3[:, 1], stdata3[:, 2]
-d40, d41, d42 = stdata4[:, 0], stdata4[:, 1], stdata4[:, 2]
-d50, d51, d52 = stdata5[:, 0], stdata5[:, 1], stdata5[:, 2]
-d60, d61, d62 = stdata6[:, 0], stdata6[:, 1], stdata6[:, 2]
+d10, d11, d12 = stdata1[:, 0], 0.1*stdata1[:, 1], 0.1*stdata1[:, 2]
+d20, d21, d22 = stdata2[:, 0], 0.1*stdata2[:, 1], 0.1*stdata2[:, 2]
+d30, d31, d32 = stdata3[:, 0], 0.1*stdata3[:, 1], 0.1*stdata3[:, 2]
+d40, d41, d42 = stdata4[:, 0], 0.1*stdata4[:, 1], 0.1*stdata4[:, 2]
+d50, d51, d52 = stdata5[:, 0], 0.1*stdata5[:, 1], 0.1*stdata5[:, 2]
+d60, d61, d62 = stdata6[:, 0], 0.1*stdata6[:, 1], 0.1*stdata6[:, 2]
 
 
 fig, (ax1,ax2) = plt.subplots(2, 1,figsize=(10,12),sharex=True)
@@ -94,9 +94,9 @@ plt.subplots_adjust(hspace=0.0)
 
 
 # ax1.set_xlabel(r'$\epsilon_0$', fontsize=20)
-ax1.set_ylabel(r'$\left(\Phi^{\prime}/\Phi\right)|_{\rm s}\,[0.1\rm \,km^{-1}]$', fontsize=30)
+ax1.set_ylabel(r'$\left(\Phi^{\prime}/\Phi\right)|_{\rm s}\,[\rm \,km^{-1}]$', fontsize=30)
 ax2.set_xlabel(r'$\epsilon_0\,[10^{15}\,\rm g\,\rm cm^{-3}]$', fontsize=30)
-ax2.set_ylabel(r'$\left(\Phi^{\prime}/\Phi\right)|_{\rm s}\,[0.1\rm \,km^{-1}]$', fontsize=30)
+ax2.set_ylabel(r'$\left(\Phi^{\prime}/\Phi\right)|_{\rm s}\,[\rm \,km^{-1}]$', fontsize=30)
 
 
  
@@ -151,14 +151,14 @@ for k in range(1,ntrim):
     if abs(d21[k]-d21[k-1])>100:
         e=d20[k]
         f=k
-ax2.plot( d20[0:f-1]/10**15, d21[0:f-1] , '--', color = colorset[1],linewidth=2)
-ax2.plot( d20[f+1:ntrim]/10**15, d21[f+1:ntrim] , '--', color = colorset[1],linewidth=2)
-ax2.plot( d20[0:ntrim]/10**15, d22[0:ntrim] , color = colorset[1],linewidth=2,label='$b=-0.2$')
+        ax2.plot( d20[0:f-1]/10**15, d21[0:f-1] , '--', color = colorset[1],linewidth=2)
+        ax2.plot( d20[f+1:ntrim]/10**15, d21[f+1:ntrim] , '--', color = colorset[1],linewidth=2)
+        ax2.plot( d20[0:ntrim]/10**15, d22[0:ntrim] , color = colorset[1],linewidth=2,label='$b=-0.2$')
 
-line1=LineString(np.column_stack((d20[0:f-1]/10**15, d21[0:f-1])))
-line2=LineString(np.column_stack((d20[0:f-1]/10**15, d22[0:f-1])))
-intersection=line1.intersection(line2)
-ax2.plot(*intersection.xy,color='brown',markersize=10,marker='o')
+        line1=LineString(np.column_stack((d20[0:f-1]/10**15, d21[0:f-1])))
+        line2=LineString(np.column_stack((d20[0:f-1]/10**15, d22[0:f-1])))
+        intersection=line1.intersection(line2)
+        ax2.plot(*intersection.xy,color='brown',markersize=10,marker='o')
 
 
 # find the jump location
