@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[3]:
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import log10 as lg
@@ -100,10 +106,7 @@ ntrim6set=[19, 21, 21, 24, 23]
 offset = [15, 15, 10, 5, 5]
 for i in range(5):
     stdata21=np.genfromtxt('stgb_tid_v1_comb_data2'+str(i+1)+'.txt')
-    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
-    c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2], \
-    stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6], \
-    stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
     x21 = c321[0:ntrim1set[i]]/MSUN 
     y21 = c921[0:ntrim1set[i]] - offset[i]*np.ones_like(c921[0:ntrim1set[i]])
     #axs[0,0].semilogy(x21, y21, 'o', color = colorset[i])
@@ -116,10 +119,7 @@ axs[0,0].xaxis.set_minor_locator(MultipleLocator(0.1))
 list2=[26,27,28,30]
 for i in range(4):
     stdata21=np.genfromtxt('stgb_tid_v1_comb_data'+str(list2[i])+'.txt')
-    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
-    c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2], \
-    stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6], \
-    stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
     x21 = c321[0:ntrim2set[i]]/MSUN 
     y21 = c921[0:ntrim2set[i]] 
     if list2[i]!=30:
@@ -135,11 +135,9 @@ axs[0,1].xaxis.set_minor_locator(MultipleLocator(0.1))
 n1=np.array([17, 17, 18, 16, 14])    
 # the third plot
 for i in range(5):
+    warnings.filterwarnings("ignore", category=UserWarning)
     stdata21=np.genfromtxt('stgb_tid_v1_comb_data3'+str(i+1)+'.txt')
-    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
-    c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2], \
-    stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6], \
-    stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
     x21 = c321/MSUN 
     y21 = c921 
     
@@ -159,25 +157,24 @@ for i in range(5):
     ydata=y2[index]
     xdata=x2[index]
     s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),10)
+    xs=np.linspace(min(xdata),max(xdata), 6)
     ys=s1(xs)
-    axs[0,2].plot(x2, y2, 'o', color = colorset[i])     
-    axs[0,2].plot(xs, ys, color = colorset[i],linewidth=3) 
-    axs[0,2].set_yscale('symlog')
+    #axs[0,2].plot(x2, y2, '>', color = colorset[i]) 
+    if i!=0:
+      axs[0,2].plot(xs, ys, color = colorset[i],linewidth=3)    
+axs[0,2].set_yscale('symlog')
 axs[0,2].set_yticks([1, 1e2, 1e4, 1e6])
 y_minor = mticker.LogLocator(base = 10.0, subs = np.arange(1.0, 2.0) * 1, numticks = 10)
 axs[0,2].yaxis.set_minor_locator(y_minor)
 axs[0,2].yaxis.set_minor_formatter(mticker.NullFormatter())
-
+#axs[0,2].set_ylim(-1e4,1e6)
 
 n2=np.array([18, 14, 9, 16, 13]) 
 # the fourth plot
 for i in range(5):
+    warnings.filterwarnings("ignore", category=UserWarning)
     stdata21=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+36)+'.txt')
-    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921, \
-    c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2], \
-    stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6], \
-    stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
     x21 = c321/MSUN
     y21 = c921
     x1=x21[0:n2[i]]
@@ -191,30 +188,43 @@ for i in range(5):
 #     ys=s1(xs)
     axs[0,3].plot(x1, y1, color = colorset[i],linewidth=3) 
     
-    x2=x21[n2[i]:len(x21)]
-    y2=y21[n2[i]:len(x21)]
-    #print(y2)
-    index=x2.argsort()
-    ydata=y2[index]
-    xdata=x2[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),10)
-    ys=s1(xs)
-    axs[0,3].plot(x2, y2, 'o', color = colorset[i])
-    axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3) 
-    axs[0,3].set_yscale('symlog')
+    if i!=2:
+      x2=x21[n2[i]:len(x21)]
+      y2=y21[n2[i]:len(x21)]
+      #print(y2)
+      index=x2.argsort()
+      ydata=y2[index]
+      xdata=x2[index]
+      s1 = UnivariateSpline(xdata, ydata, s=5)
+      xs=np.linspace(min(xdata),max(xdata),6)
+      ys=s1(xs)
+      #axs[0,3].plot(x2, y2, '>', color = colorset[i])
+      axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3) 
+    else:
+      x2=x21[n2[i]:len(x21)]
+      y2=y21[n2[i]:len(x21)]
+      #print(y2)
+      index=x2.argsort()
+      ydata=y2[index][0:7]
+      xdata=x2[index][0:7]
+      s1 = UnivariateSpline(xdata, ydata, s=5)
+      xs=np.linspace(min(xdata),max(xdata),6)
+      ys=s1(xs)
+      #axs[0,3].plot(x2, y2, '>', color = colorset[i])
+      axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3)      
+axs[0,3].set_yscale('symlog')
 axs[0,3].set_yticks([1, 1e2, 1e4, 1e6])
 y_minor = mticker.LogLocator(base = 10.0, subs = np.arange(1.0, 2.0) * 1, numticks = 10)
 axs[0,3].yaxis.set_minor_locator(y_minor)
 axs[0,3].yaxis.set_minor_formatter(mticker.NullFormatter())
+#axs[0,3].set_ylim(-1e5,1e6)
+
 
 # the fifth plot
 for i in range(5):
     stdata1=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+1)+'.txt')
 
-    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],\
-    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4], \
-    stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
+    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4],     stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
     x1 = c31[0:ntrim5set[i]]/MSUN 
     y1 = c71[0:ntrim5set[i]] 
     #axs[1,0].semilogy(x1, y1, 'o', color = colorset[i]) 
@@ -227,33 +237,37 @@ axs[1,0].xaxis.set_minor_locator(MultipleLocator(0.1))
 for i in range(5):
     stdata1=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+6)+'.txt')
 
-    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],\
-    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4], \
-    stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
+    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4],     stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
     x1 = c31[0:ntrim6set[i]]/MSUN 
     y1 = c71[0:ntrim6set[i]] 
     #axs[1,1].semilogy(x1, y1, 'o', color = colorset[i])
     axs[1,1].semilogy(x1, y1, color = colorset[i], linewidth=5) 
 axs[1,1].set_yticks([1,10,100,1000,10000])
 axs[1,1].minorticks_off()
-axs[1,1].xaxis.set_minor_locator(MultipleLocator(0.1))    
-    
+axs[1,1].xaxis.set_minor_locator(MultipleLocator(0.1)) 
+
 # the seventh plot
 for i in range(5):
     stdata1=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+11)+'.txt')
 
-    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],\
-    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4], \
-    stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
+    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4],     stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
     x1 = c31/MSUN 
     y1 = c71 
-    index=x1.argsort()
-    ydata=y1[index]
-    xdata=x1[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),10)
-    ys=s1(xs)     
+    a=x1[0:12]
+    b=x1[14:-1]
+    c=np.hstack([a,b])
+    d=y1[0:12]
+    e=y1[14:-1]
+    f=np.hstack([d,e])
+    
+    index=c.argsort()
+    ydata=np.log10(f[index])
+    xdata=c[index]
+    s1 = UnivariateSpline(xdata, ydata, s=10)
+    xs=np.linspace(min(xdata),max(xdata),50)
+    ys=10**s1(xs)
     axs[1,2].semilogy(xs, ys, color = colorset[i],linewidth=3) 
+    
 axs[1,2].set_yticks([1, 1e2, 1e4, 1e6])
 y_minor = mticker.LogLocator(base = 10.0, subs = np.arange(1.0, 2.0) * 1, numticks = 10)
 axs[1,2].yaxis.set_minor_locator(y_minor)
@@ -264,17 +278,23 @@ axs[1,2].yaxis.set_minor_formatter(mticker.NullFormatter())
 for i in range(5):
     stdata1=np.genfromtxt('stgb_tid_v1_comb_data'+str(i+16)+'.txt')
 
-    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],\
-    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4], \
-    stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
+    c01, c11, c21, c31, c41, c51, c61, c71, c81, c91, c101=stdata1[:, 0],    stdata1[:, 1], stdata1[:, 2], stdata1[:, 3], stdata1[:, 4],     stdata1[:, 5], stdata1[:, 6], stdata1[:, 7], stdata1[:, 8], stdata1[:, 9], stdata1[:, 10] 
     x1 = c31/MSUN 
-    y1 = c71
-    index=x1.argsort()
-    ydata=y1[index]
-    xdata=x1[index]
-    s1 = UnivariateSpline(xdata, ydata, s=5)
-    xs=np.linspace(min(xdata),max(xdata),10)
-    ys=s1(xs)     
+    y1 = c71 
+
+    a=x1[0:12]
+    b=x1[14:-1]
+    c=np.hstack([a,b])
+    d=y1[0:12]
+    e=y1[14:-1]
+    f=np.hstack([d,e])
+    
+    index=c.argsort()
+    ydata=np.log10(f[index])
+    xdata=c[index]
+    s1 = UnivariateSpline(xdata, ydata, s=10)
+    xs=np.linspace(min(xdata),max(xdata),50)
+    ys=10**s1(xs)
     axs[1,3].semilogy(xs, ys, color = colorset[i],linewidth=3) 
 axs[1,3].set_yticks([1, 1e2, 1e4, 1e6])
 y_minor = mticker.LogLocator(base = 10.0, subs = np.arange(1.0, 2.0) * 1, numticks = 10)
@@ -293,3 +313,5 @@ fig.text(0.78, 0.9, r'$b=10$' ,fontsize=30)
 plt.savefig("fig_nonlin_Mtidal.pdf", format='pdf', bbox_inches="tight")
 
 plt.show()
+
+

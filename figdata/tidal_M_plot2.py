@@ -294,7 +294,7 @@ fig.text(0.18, 0.9, r'$b=-1$' ,fontsize=30)
 fig.text(0.38, 0.9, r'$b=-0.2$' ,fontsize=30)     
 fig.text(0.58, 0.9, r'$b=3$' ,fontsize=30)   
 fig.text(0.78, 0.9, r'$b=10$' ,fontsize=30)  
-plt.savefig("fig_nonlin_Mtidal.pdf", format='pdf', bbox_inches="tight")
+plt.savefig("fig_nonlin_Mtidal2.pdf", format='pdf', bbox_inches="tight")
 
 plt.show()
 
