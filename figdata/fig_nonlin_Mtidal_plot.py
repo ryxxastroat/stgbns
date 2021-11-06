@@ -303,7 +303,7 @@ axs[1,3].yaxis.set_minor_formatter(mticker.NullFormatter())
 
     
 fig.text(0.08, 0.5,r'$\lambda/M^5$'  , ha='center', fontsize=30,rotation='vertical')
-fig.text(0.48, 0.05, r'$M\,[{ \rm M_{\odot}}]$',fontsize=30)      
+fig.text(0.48, 0.05, r'$M\,[{ M_{\odot}}]$',fontsize=30)      
 fig.text(0.91, 0.7, r'$a=1$' ,fontsize=30, rotation='-90')          
 fig.text(0.91, 0.27, r'$a=0.1$' ,fontsize=30, rotation='-90')     
 fig.text(0.18, 0.9, r'$b=-1$' ,fontsize=30)     

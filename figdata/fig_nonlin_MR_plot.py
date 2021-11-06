@@ -251,7 +251,7 @@ for i in range(5):
 axs[0,0].legend(fontsize=13, frameon=False)
 
 
-fig.text(0.08, 0.5, r'$M\,[{\rm M_{\odot}}]$', ha='center', fontsize=30,rotation='vertical')
+fig.text(0.08, 0.5, r'$M\,[{ M_{\odot}}]$', ha='center', fontsize=30,rotation='vertical')
 fig.text(0.48, 0.05, r'$R\,[\rm km]$' ,fontsize=30)      
 fig.text(0.91, 0.7, r'$a=1$' ,fontsize=30, rotation='-90')          
 fig.text(0.91, 0.27, r'$a=0.1$' ,fontsize=30, rotation='-90')     
