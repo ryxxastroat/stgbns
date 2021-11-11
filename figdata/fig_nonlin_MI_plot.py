@@ -102,7 +102,7 @@ for i in range(5):
     data[:, 8], data[:, 9], data[:, 10] 
     x21 = c321/MSUN 
     y21 = c421/1e45
-    axs[0,0].plot(x21, y21, color = colorset[i], linewidth=4,label=label[i]) 
+    axs[0,0].plot(x21, y21, color = colorset[i], linewidth=4, label=label[i]) 
 axs[0,0].legend(frameon=False,fontsize=18)     
   
 # the second plot

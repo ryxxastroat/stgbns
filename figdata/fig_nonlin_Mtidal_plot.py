@@ -126,7 +126,7 @@ for i in range(5):
     x21 = c321[0:ntrim1set[i]]/MSUN 
     y21 = c921[0:ntrim1set[i]] - offset[i]*np.ones_like(c921[0:ntrim1set[i]])
     #axs[0,0].semilogy(x21, y21, 'o', color = colorset[i])
-    axs[0,0].semilogy(x21, y21, color = colorset[i], linewidth =5,label=label[k])  
+    axs[0,0].semilogy(x21, y21, color = colorset[i], linewidth =5, label=label[i])  
 axs[0,0].legend(frameon=False,fontsize=18)   
 
 axs[0,0].set_yticks([1,10,100,1000,10000]) 
