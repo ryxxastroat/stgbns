@@ -119,9 +119,9 @@ dimllatidalset3 = dimllatidal(0.1, ytidalset)
 #plt.rcParams['ytick.major.size'] = 8        
 
 
-plt.plot(ytidalset, dimllatidalset1, linestyle='solid', linewidth=linewidthset[2], color=colorset[0], label='$C$ = 0.01')
-plt.plot(ytidalset, dimllatidalset2, linestyle='dotted', linewidth=linewidthset[2], color=colorset[1], label='$C$ = 0.05')
-plt.plot(ytidalset, dimllatidalset3, linestyle='dashed', linewidth=linewidthset[2], color=colorset[2], label='$C$ = 0.1')
+plt.plot(ytidalset, dimllatidalset1, linestyle='solid', linewidth=linewidthset[2], color=colorset[0], label='$C = 0.01$')
+plt.plot(ytidalset, dimllatidalset2, linestyle='dotted', linewidth=linewidthset[2], color=colorset[1], label='$C = 0.05$')
+plt.plot(ytidalset, dimllatidalset3, linestyle='dashed', linewidth=linewidthset[2], color=colorset[2], label='$C = 0.1$')
 
 plt.yscale('symlog')
 plt.yticks([-1e8, -1e6, -1e4, -1e2, 0, 1e2, 1e4, 1e6, 1e8]) 
@@ -129,7 +129,7 @@ plt.minorticks_off()
 plt.ylabel(r'$ \lambda/M^5$',fontsize=30)
 plt.xlabel(r'$y$',fontsize=30)
 
-plt.legend(fontsize = 25,frameon=False)
+plt.legend(fontsize=28, frameon=False, loc='upper right')
 
 
 plt.minorticks_on()
