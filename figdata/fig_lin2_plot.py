@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import log10 as lg
@@ -46,12 +40,42 @@ from scipy.integrate import ode as sp_ode
 
 t0 = timeit.time.time()
 from shapely.geometry import LineString
+from matplotlib.legend_handler import HandlerTuple
 
 
-plt.close()
+
+class HandlerTupleVertical(HandlerTuple):
+    def __init__(self, **kwargs):
+        HandlerTuple.__init__(self, **kwargs)
+
+    def create_artists(self, legend, orig_handle,
+                       xdescent, ydescent, width, height, fontsize, trans):
+        # How many lines are there.
+        numlines = len(orig_handle)
+        handler_map = legend.get_legend_handler_map()
+
+        # divide the vertical space where the lines will go
+        # into equal parts based on the number of lines
+        height_y = (height / numlines)
+
+        leglines = []
+        for i, handle in enumerate(orig_handle):
+            handler = legend.get_legend_handler(handler_map, handle)
+
+            legline = handler.create_artists(legend, handle,
+                                             xdescent,
+                                             (2*i + 1)*height_y,
+                                             width,
+                                             2*height,
+                                             fontsize, trans)
+            leglines.extend(legline)
+
+        return leglines
 
 
-# In[44]:
+
+
+
 
 
 PI4 = 4.0 * pi
@@ -105,7 +129,7 @@ for j in range(5):
     s1 = UnivariateSpline(x, y, s=5)
     xs=np.linspace(min(x),max(x),20)
     ys=s1(xs)
-    ax2.plot( xs,ys , color = colorset[j],linewidth=1.5)
+    ax2.plot( xs,ys , color = colorset[j], linewidth=1.5)
 
 data2 = np.genfromtxt('stgb_linear_v1_xia_data2.txt')
 for j in range(5):
@@ -114,9 +138,11 @@ for j in range(5):
     s1 = UnivariateSpline(x, y, s=5)
     xs=np.linspace(min(x),max(x),20)
     ys=s1(xs)
-    ax2.plot( xs,ys , color = colorset[j],linewidth=1.5,linestyle='--')
+    ax2.plot( xs,ys , color = colorset[j], linewidth=1.5, linestyle='--')
     
-    
+p1set = [0, 0, 0, 0, 0]    
+p2set = [0, 0, 0, 0, 0]    
+
 data3 = np.genfromtxt('stgb_linear_v1_xia_data3.txt')
 for j in range(5):
     x=data3[:,0]
@@ -124,7 +150,7 @@ for j in range(5):
     s1 = UnivariateSpline(x, y, s=5)
     xs=np.linspace(min(x),max(x),20)
     ys=s1(xs)
-    ax1.plot( xs,ys , color = colorset[j],linewidth=1.5,label=label[j])
+    p1set[j], = ax1.plot( xs,ys , color = colorset[j], linewidth=1.5, label=label[j])
     
 data4 = np.genfromtxt('stgb_linear_v1_xia_data4.txt')
 for j in range(5):
@@ -133,7 +159,7 @@ for j in range(5):
     s1 = UnivariateSpline(x, y, s=5)
     xs=np.linspace(min(x),max(x),20)
     ys=s1(xs)
-    ax1.plot( xs,ys , color = colorset[j],linewidth=1.5,linestyle='--')
+    p2set[j], = ax1.plot( xs,ys , color = colorset[j], linewidth=1.5, linestyle='--')
 
 ax2.set_ylim(-0.65,0.1)
 ax1.set_ylim(-0.5,10.5)
@@ -141,8 +167,9 @@ plt.xlim(0,3)
 
 ax1.minorticks_on()
 ax2.minorticks_on()
-ax1.legend(fontsize=20,frameon=False)
-
+#ax1.legend(fontsize=20,frameon=False)
+ax1.legend([(p1set[0], p2set[0]), (p1set[1], p2set[1]), (p1set[2], p2set[2]), (p1set[3], p2set[3]), (p1set[4], p2set[4])], ['WFF1', 'SLy4', 'AP4', 'MPA1', 'PAL1'],
+               handler_map={tuple: HandlerTupleVertical()}, fontsize=20,frameon=False)
 
 plt.savefig("fig_lin2.pdf", format='pdf', bbox_inches="tight")
 # print( '\n *** STG_solver uses %.2f seconds\n' % (timeit.time.time() - t0))

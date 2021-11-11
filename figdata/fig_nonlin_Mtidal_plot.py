@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[3]:
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import log10 as lg
@@ -17,8 +11,6 @@ import scipy.optimize as opt
 from matplotlib import cm
 from astropy import constants as const
 from astropy import units as u
-import matplotlib.ticker as mticker 
-
 plt.rcParams['xtick.labelsize'] = 25
 plt.rcParams['ytick.labelsize'] = 25
 plt.rcParams['xtick.direction'] = 'in'
@@ -40,10 +32,34 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
 import sys
 import warnings
 import timeit
+import numpy as np
 import scipy.optimize
+from numpy import pi
+import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy.integrate import ode as sp_ode
 
+t0 = timeit.time.time()
+from shapely.geometry import LineString
+from scipy.interpolate import UnivariateSpline
+G=const.G.cgs.value
+c=const.c.cgs.value
+MSUN=const.M_sun.cgs.value
+hbar=const.hbar.cgs.value
+m_n=const.m_n.cgs.value
+KM=10**5
+import math
+
+G=const.G.cgs.value
+c=const.c.cgs.value
+Ms=const.M_sun.cgs.value
+hbar=const.hbar.cgs.value
+m_n=const.m_n.cgs.value
+km=10**5
+
+plt.close()
+import matplotlib.ticker as mticker 
+label=['WFF1','SLy4','AP4', 'MPA1','PAL1']
 t0 = timeit.time.time()
 from shapely.geometry import LineString
 from scipy.interpolate import UnivariateSpline
@@ -103,14 +119,16 @@ ntrim6set=[19, 21, 21, 24, 23]
 
 
 # the first plot
-offset = [15, 15, 10, 5, 5]
+offset = [15, 15, 10, 10, 7]
 for i in range(5):
     stdata21=np.genfromtxt('stgb_tid_v1_comb_data2'+str(i+1)+'.txt')
     c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
     x21 = c321[0:ntrim1set[i]]/MSUN 
     y21 = c921[0:ntrim1set[i]] - offset[i]*np.ones_like(c921[0:ntrim1set[i]])
     #axs[0,0].semilogy(x21, y21, 'o', color = colorset[i])
-    axs[0,0].semilogy(x21, y21, color = colorset[i], linewidth =5)     
+    axs[0,0].semilogy(x21, y21, color = colorset[i], linewidth =5,label=label[k])  
+axs[0,0].legend(frameon=False,fontsize=18)   
+
 axs[0,0].set_yticks([1,10,100,1000,10000]) 
 axs[0,0].minorticks_off()
 axs[0,0].xaxis.set_minor_locator(MultipleLocator(0.1)) 
@@ -132,19 +150,25 @@ axs[0,1].set_yticks([1,10,100,1000,10000])
 axs[0,1].minorticks_off()
 axs[0,1].xaxis.set_minor_locator(MultipleLocator(0.1))
     
-n1=np.array([17, 17, 18, 16, 14])    
+n1=np.array([17, 17, 18, 16, 14])   
+
 # the third plot
+offset3 = [2.7,2.7,2.7,2,1.7]
 for i in range(5):
     warnings.filterwarnings("ignore", category=UserWarning)
     stdata21=np.genfromtxt('stgb_tid_v1_comb_data3'+str(i+1)+'.txt')
-    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
+    c021, c121, c221, c321, c421, c521, c621, c721, c821, c921,     \
+    c1021=stdata21[:, 0], stdata21[:, 1], stdata21[:, 2],     \
+    stdata21[:, 3], stdata21[:, 4], stdata21[:, 5], stdata21[:, 6],     \
+    stdata21[:, 7], stdata21[:, 8], stdata21[:, 9], stdata21[:, 10] 
     x21 = c321/MSUN 
-    y21 = c921 
+    y21 = c921
     
     x1=x21[0:n1[i]]
     y1=y21[0:n1[i]]
+    y2=y1-offset3[i]*np.ones_like(y1)
     index=x1.argsort()
-    ydata=y1[index]
+    ydata=y2[index]
     xdata=x1[index]
     s1 = UnivariateSpline(xdata, ydata, s=5)
     xs=np.linspace(min(xdata),max(xdata),10)
@@ -161,7 +185,7 @@ for i in range(5):
     ys=s1(xs)
     #axs[0,2].plot(x2, y2, '>', color = colorset[i]) 
     if i!=0:
-      axs[0,2].plot(xs, ys, color = colorset[i],linewidth=3)    
+        axs[0,2].plot(xs, ys, color = colorset[i],linewidth=3)    
 axs[0,2].set_yscale('symlog')
 axs[0,2].set_yticks([1, 1e2, 1e4, 1e6])
 y_minor = mticker.LogLocator(base = 10.0, subs = np.arange(1.0, 2.0) * 1, numticks = 10)
@@ -170,6 +194,7 @@ axs[0,2].yaxis.set_minor_formatter(mticker.NullFormatter())
 #axs[0,2].set_ylim(-1e4,1e6)
 
 n2=np.array([18, 14, 9, 16, 13]) 
+offset4 = [60,24,24,23,23]
 # the fourth plot
 for i in range(5):
     warnings.filterwarnings("ignore", category=UserWarning)
@@ -179,6 +204,7 @@ for i in range(5):
     y21 = c921
     x1=x21[0:n2[i]]
     y1=y21[0:n2[i]]
+    y2=y1-offset4[i]*np.ones_like(y1)
     #print(y1)
 #     index=x1.argsort()
 #     ydata=y1[index]
@@ -186,32 +212,32 @@ for i in range(5):
 #     s1 = UnivariateSpline(xdata, ydata, s=5)
 #     xs=np.linspace(min(xdata),max(xdata),10)
 #     ys=s1(xs)
-    axs[0,3].plot(x1, y1, color = colorset[i],linewidth=3) 
+    axs[0,3].plot(x1, y2, color = colorset[i],linewidth=3) 
     
     if i!=2:
-      x2=x21[n2[i]:len(x21)]
-      y2=y21[n2[i]:len(x21)]
-      #print(y2)
-      index=x2.argsort()
-      ydata=y2[index]
-      xdata=x2[index]
-      s1 = UnivariateSpline(xdata, ydata, s=5)
-      xs=np.linspace(min(xdata),max(xdata),6)
-      ys=s1(xs)
-      #axs[0,3].plot(x2, y2, '>', color = colorset[i])
-      axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3) 
+        x2=x21[n2[i]:len(x21)]
+        y2=y21[n2[i]:len(x21)]
+        #print(y2)
+        index=x2.argsort()
+        ydata=y2[index]
+        xdata=x2[index]
+        s1 = UnivariateSpline(xdata, ydata, s=5)
+        xs=np.linspace(min(xdata),max(xdata),6)
+        ys=s1(xs)
+        #axs[0,3].plot(x2, y2, '>', color = colorset[i])
+        axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3) 
     else:
-      x2=x21[n2[i]:len(x21)]
-      y2=y21[n2[i]:len(x21)]
-      #print(y2)
-      index=x2.argsort()
-      ydata=y2[index][0:7]
-      xdata=x2[index][0:7]
-      s1 = UnivariateSpline(xdata, ydata, s=5)
-      xs=np.linspace(min(xdata),max(xdata),6)
-      ys=s1(xs)
-      #axs[0,3].plot(x2, y2, '>', color = colorset[i])
-      axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3)      
+        x2=x21[n2[i]:len(x21)]
+        y2=y21[n2[i]:len(x21)]
+        #print(y2)
+        index=x2.argsort()
+        ydata=y2[index][0:7]
+        xdata=x2[index][0:7]
+        s1 = UnivariateSpline(xdata, ydata, s=5)
+        xs=np.linspace(min(xdata),max(xdata),6)
+        ys=s1(xs)
+        #axs[0,3].plot(x2, y2, '>', color = colorset[i])
+        axs[0,3].plot(xs, ys, color = colorset[i],linewidth=3)      
 axs[0,3].set_yscale('symlog')
 axs[0,3].set_yticks([1, 1e2, 1e4, 1e6])
 y_minor = mticker.LogLocator(base = 10.0, subs = np.arange(1.0, 2.0) * 1, numticks = 10)
@@ -313,5 +339,3 @@ fig.text(0.78, 0.9, r'$b=10$' ,fontsize=30)
 plt.savefig("fig_nonlin_Mtidal.pdf", format='pdf', bbox_inches="tight")
 
 plt.show()
-
-
