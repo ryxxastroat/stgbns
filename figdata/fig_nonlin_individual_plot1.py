@@ -89,9 +89,9 @@ def schwarzgtt(r, mass):
     return -1 + 2.0*G*mass/r/c**2
 
    
-colorset=['black', 'lightcoral', 'yellowgreen', 'cornflowerblue' ] 
-linewidthback = 1.5
-linewidthfront = 2
+colorset=['black', 'lightcoral', 'yellowgreen'] 
+linewidthback = 2
+linewidthfront = 3
   
 grdata1 = np.genfromtxt('TOV_5eqs_sol_data14.txt')
 grdata2 = np.genfromtxt('TOV_5eqs_sol_data20.txt')
@@ -159,73 +159,110 @@ for i in range(0, len(c50)):
 
 
 
-fig, (ax1, ax2, ax3) = plt.subplots(3, 1,figsize=(8,15),sharex=True)
-plt.subplots_adjust(hspace=0.0)
 
-
+fig = plt.figure(figsize=(24,24))
+ax1 = fig.add_subplot(331)
+ax2 = fig.add_subplot(332)
+ax3 = fig.add_subplot(333)
+ax4 = fig.add_subplot(334)
+ax5 = fig.add_subplot(335)
+ax6 = fig.add_subplot(336)
+ax7 = fig.add_subplot(337)
+ax8 = fig.add_subplot(338)
+ax9 = fig.add_subplot(339)
 
 fontsizevalue1 = 30
 ax1.set_ylabel(r'$g_{tt}$', fontsize=fontsizevalue1)
-ax2.set_ylabel(r'$g_{rr}$', fontsize=fontsizevalue1)
-ax3.set_ylabel(r'$\Phi$', fontsize=fontsizevalue1)
-ax3.set_xlabel(r'$r\,[\rm km]$', fontsize=fontsizevalue1)
+ax4.set_ylabel(r'$g_{rr}$', fontsize=fontsizevalue1)
+ax7.set_ylabel(r'$\Phi$', fontsize=fontsizevalue1)
 
-ax1.set_ylim([-0.95, 0])
-ax2.set_ylim([0.9, 3.0])
-ax3.set_ylim([-0.01, 0.085])
-
-"""
 fig.text(0.2, 0.9, r'$M=1.4M_{\odot}$' ,fontsize=30)     
 fig.text(0.47, 0.9, r'$M=2.0M_{\odot}$' ,fontsize=30)     
-fig.text(0.74, 0.9, r'$M=2.2M_{\odot}$' ,fontsize=30) 
+fig.text(0.74, 0.9, r'$M=2.2M_{\odot}$' ,fontsize=30)  
 fig.text(0.48, 0.077, r'$r\,[\rm km]$' ,fontsize=30)
+
+
+
+ax1.set_ylim([-1, -0.3])
+ax2.set_ylim([-1, -0.1])
+ax3.set_ylim([-1, -0.])
+"""
+ax4.set_xlim([0, 100])
+ax5.set_xlim([0, 100])
+ax5.set_ylim([1, 3])
+ax6.set_xlim([0, 100])
+ax6.set_ylim([-0.005, 0.018])
+
+ax1.plot(a10/KM, a11)
+ax2.plot(a10/KM, a12)
 """
 
 ntrim1, ntrim2, ntrim3, ntrim4, ntrim5 = 5000, 5000, 5000, 5000, 5000
 
 
 
-ax1.plot(c30[:ntrim3]*runit/KM, gtt3[:ntrim3], color = colorset[1], \
-         linewidth = linewidthfront, label='$2.0M_{\odot}\ a, b = 1, 3$')
-ax2.plot(c30[:ntrim3]*runit/KM, grr3[:ntrim3], color = colorset[1], \
-         linewidth = linewidthfront)
-ax3.plot(c30[:ntrim3]*runit/KM, c33[:ntrim3], color = colorset[1], \
-         linewidth = linewidthfront)
-ax1.plot(a20/KM, a21, ':', color = colorset[0], linewidth = linewidthfront, label='$2.0M_{\odot}\ a, b = 0, 0$ (GR)')
-ax2.plot(a20/KM, a22, ':', color = colorset[0], linewidth = linewidthfront)
-ax1.plot(x2/KM, y2, ':', color = colorset[0], linewidth = linewidthback)
-ax2.plot(x2/KM, -1./y2, ':', color = colorset[0], linewidth = linewidthback)
+ax1.plot(c10[:ntrim1]*runit/KM, gtt1[:ntrim1], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 0.1, -1$')
+ax4.plot(c10[:ntrim1]*runit/KM, grr1[:ntrim1], color = colorset[1], \
+         linewidth = linewidthfront,label='$a, b = 0.1, -1$')
+ax7.plot(c10[:ntrim1]*runit/KM, c13[:ntrim1], color = colorset[1], \
+         linewidth = linewidthfront,label='$a, b = 0.1, -1$')
+ax1.plot(c20[:ntrim2]*runit/KM, gtt2[:ntrim2], color = colorset[2], \
+         linewidth = linewidthfront, label='$a, b = 0.1, 3$')
+ax4.plot(c20[:ntrim2]*runit/KM, grr2[:ntrim2], color = colorset[2], \
+         linewidth = linewidthfront, label='$a, b = 0.1, 3$')
+ax7.plot(c20[:ntrim2]*runit/KM, c23[:ntrim2], color = colorset[2], \
+         linewidth = linewidthfront, label='$a, b = 0.1, 3$')
+ax1.plot(a10/KM, a11, '--', color = colorset[0], linewidth = linewidthback)
+ax4.plot(a10/KM, a12, '--', color = colorset[0], linewidth = linewidthback)
+ax1.plot(x1/KM, y1, '--', color = colorset[0], linewidth = linewidthback, label='$a, b = 0, 0$ (GR)')
+ax4.plot(x1/KM, -1./y1, '--', color = colorset[0], linewidth = linewidthback, label='$a, b = 0, 0$ (GR)')
 
 
-ax1.plot(c40[:ntrim4]*runit/KM, gtt4[:ntrim4], color = colorset[2], \
-         linewidth = linewidthfront, label='$2.2M_{\odot}\ a, b = 1, -0.2$')
-ax2.plot(c40[:ntrim4]*runit/KM, grr4[:ntrim4], color = colorset[2], \
-         linewidth = linewidthfront)
-ax3.plot(c40[:ntrim4]*runit/KM, c43[:ntrim4], color = colorset[2], \
-         linewidth = linewidthfront)
-ax1.plot(c50[:ntrim5]*runit/KM, gtt5[:ntrim5], color = colorset[3], \
-         linewidth = linewidthfront, label='$2.2M_{\odot}\ a, b = 1, -1$')
-ax2.plot(c50[:ntrim5]*runit/KM, grr5[:ntrim5], color = colorset[3], \
-         linewidth = linewidthfront)
-ax3.plot(c50[:ntrim5]*runit/KM, c53[:ntrim5], color = colorset[3], \
-         linewidth = linewidthfront)
-ax1.plot(a30/KM, a31, linestyle='--', color = colorset[0], \
-         linewidth = linewidthfront, label='$2.2M_{\odot}\ a, b = 0, 0$ (GR)')
-ax2.plot(a30/KM, a32, '--', color = colorset[0], linewidth = linewidthfront)
-ax1.plot(x3/KM, y3, '--', color = colorset[0], linewidth = linewidthback)
-ax2.plot(x3/KM, -1./y3, '--', color = colorset[0], linewidth = linewidthback)
+ax2.plot(c30[:ntrim3]*runit/KM, gtt3[:ntrim3], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 1, 3$')
+ax5.plot(c30[:ntrim3]*runit/KM, grr3[:ntrim3], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 1, 3$')
+ax8.plot(c30[:ntrim3]*runit/KM, c33[:ntrim3], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 1, 3$')
+ax2.plot(a20/KM, a21, '--', color = colorset[0], linewidth = linewidthfront, label='$a, b = 0, 0$ (GR)')
+ax5.plot(a20/KM, a22, '--', color = colorset[0], linewidth = linewidthfront, label='$a, b = 0, 0$ (GR)')
+ax2.plot(x2/KM, y2, '--', color = colorset[0], linewidth = linewidthback)
+ax5.plot(x2/KM, -1./y2, '--', color = colorset[0], linewidth = linewidthback)
 
-ax1.minorticks_on()
-ax2.minorticks_on()
-ax3.minorticks_on()
 
-ax1.legend(fontsize=22, frameon=False)
-#ax2.legend(fontsize=20, frameon=False)
-#ax3.legend(fontsize=20, frameon=False)
+ax3.plot(c40[:ntrim4]*runit/KM, gtt4[:ntrim4], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 1, -0.2$')
+ax6.plot(c40[:ntrim4]*runit/KM, grr4[:ntrim4], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 1, -0.2$')
+ax9.plot(c40[:ntrim4]*runit/KM, c43[:ntrim4], color = colorset[1], \
+         linewidth = linewidthfront, label='$a, b = 1, -0.2$')
+ax3.plot(c50[:ntrim5]*runit/KM, gtt5[:ntrim5], color = colorset[2], \
+         linewidth = linewidthfront, label='$a, b = 1, -1$')
+ax6.plot(c50[:ntrim5]*runit/KM, grr5[:ntrim5], color = colorset[2], \
+         linewidth = linewidthfront, label='$a, b = 1, -1$')
+ax9.plot(c50[:ntrim5]*runit/KM, c53[:ntrim5], color = colorset[2], \
+         linewidth = linewidthfront, label='$a, b = 1, -1$')
+ax3.plot(a30/KM, a31, linestyle='--', color = colorset[0], \
+         linewidth = linewidthfront, label='$a, b = 0, 0$ (GR)')
+ax6.plot(a30/KM, a32, '--', color = colorset[0], linewidth = linewidthfront, label='$a, b = 0, 0$ (GR)')
+ax3.plot(x3/KM, y3, '--', color = colorset[0], linewidth = linewidthback)
+ax6.plot(x3/KM, -1./y3, '--', color = colorset[0], linewidth = linewidthback)
 
+
+ax1.legend(fontsize=25, frameon=False)
+ax4.legend(fontsize=25, frameon=False)
+ax7.legend(fontsize=25, frameon=False)
+ax2.legend(fontsize=25, frameon=False)
+ax5.legend(fontsize=25, frameon=False)
+ax8.legend(fontsize=25, frameon=False)
+ax3.legend(fontsize=25, frameon=False)
+ax6.legend(fontsize=25, frameon=False)
+ax9.legend(fontsize=25, frameon=False)
 
 plt.savefig("fig_nonlin_ind.pdf", format='pdf', bbox_inches="tight")
 
 print( '\n *** STG_solver uses %.2f seconds\n' % (timeit.time.time() - t0))
+plt.minorticks_on()
 plt.show()
 
